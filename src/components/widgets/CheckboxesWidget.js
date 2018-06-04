@@ -1,56 +1,45 @@
 import React from "react";
 import PropTypes from "prop-types";
-
-function selectValue(value, selected, all) {
-  const at = all.indexOf(value);
-  const updated = selected.slice(0, at).concat(value, selected.slice(at));
-  // As inserting values at predefined index positions doesn't work with empty
-  // arrays, we need to reorder the updated selection to match the initial order
-  return updated.sort((a, b) => all.indexOf(a) > all.indexOf(b));
-}
-
-function deselectValue(value, selected) {
-  return selected.filter(v => v !== value);
-}
+import { Checkbox, Row, Col } from "antd";
+import "antd/lib/checkbox/style/css";
+import "antd/lib/row/style/css";
+import "antd/lib/col/style/css";
+const CheckboxGroup = Checkbox.Group;
 
 function CheckboxesWidget(props) {
   const { id, disabled, options, value, autofocus, readonly, onChange } = props;
   const { enumOptions, inline } = options;
   return (
-    <div className="checkboxes" id={id}>
-      {enumOptions.map((option, index) => {
-        const checked = value.indexOf(option.value) !== -1;
-        const disabledCls = disabled || readonly ? "disabled" : "";
-        const checkbox = (
-          <span>
-            <input
-              type="checkbox"
-              id={`${id}_${index}`}
-              checked={checked}
-              disabled={disabled || readonly}
-              autoFocus={autofocus && index === 0}
-              onChange={event => {
-                const all = enumOptions.map(({ value }) => value);
-                if (event.target.checked) {
-                  onChange(selectValue(option.value, value, all));
-                } else {
-                  onChange(deselectValue(option.value, value));
-                }
-              }}
-            />
-            <span>{option.label}</span>
-          </span>
-        );
-        return inline ? (
-          <label key={index} className={`checkbox-inline ${disabledCls}`}>
-            {checkbox}
-          </label>
-        ) : (
-          <div key={index} className={`checkbox ${disabledCls}`}>
-            <label>{checkbox}</label>
-          </div>
-        );
-      })}
+    <div>
+      <CheckboxGroup
+        style={{ width: "100%" }}
+        value={value}
+        onChange={values => {
+          onChange(values);
+        }}>
+        <Row>
+          {enumOptions.map((option, index) => {
+            const disabledValue = disabled || readonly ? "disabled" : "";
+            const checkbox = (
+              <Checkbox
+                key={option.value}
+                value={option.value}
+                id={`${id}_${index}`}
+                disabled={disabledValue || readonly}
+                autoFocus={autofocus && index === 0}>
+                {option.label}
+              </Checkbox>
+            );
+            return inline ? (
+              <label key={index}>{checkbox}</label>
+            ) : (
+              <Col span={8} key={index}>
+                {checkbox}
+              </Col>
+            );
+          })}
+        </Row>
+      </CheckboxGroup>
     </div>
   );
 }

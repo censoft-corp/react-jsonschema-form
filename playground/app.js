@@ -2,11 +2,10 @@ import React, { Component } from "react";
 import { render } from "react-dom";
 import { UnControlled as CodeMirror } from "react-codemirror2";
 import "codemirror/mode/javascript/javascript";
-
+import { Layout, Row, Col, Tag, Button, Icon, Card } from "antd";
 import { shouldRender } from "../src/utils";
 import { samples } from "./samples";
 import Form from "../src";
-
 // Import a few CodeMirror themes; these are used to match alternative
 // bootstrap ones.
 import "codemirror/lib/codemirror.css";
@@ -17,6 +16,14 @@ import "codemirror/theme/ttcn.css";
 import "codemirror/theme/solarized.css";
 import "codemirror/theme/monokai.css";
 import "codemirror/theme/eclipse.css";
+const { Content } = Layout;
+import "antd/lib/layout/style/css";
+import "antd/lib/row/style/css";
+import "antd/lib/col/style/css";
+import "antd/lib/tag/style/css";
+import "antd/lib/button/style/css";
+import "antd/lib/card/style/css";
+import "antd/lib/icon/style/css";
 
 const log = type => console.log.bind(console, type);
 const fromJson = json => JSON.parse(json);
@@ -201,22 +208,14 @@ class Editor extends Component {
   };
 
   render() {
-    const { title, theme } = this.props;
-    const icon = this.state.valid ? "ok" : "remove";
-    const cls = this.state.valid ? "valid" : "invalid";
+    const { theme } = this.props;
     return (
-      <div className="panel panel-default">
-        <div className="panel-heading">
-          <span className={`${cls} glyphicon glyphicon-${icon}`} />
-          {" " + title}
-        </div>
-        <CodeMirror
-          value={this.state.code}
-          onChange={this.onCodeChange}
-          autoCursor={false}
-          options={Object.assign({}, cmOptions, { theme })}
-        />
-      </div>
+      <CodeMirror
+        value={this.state.code}
+        onChange={this.onCodeChange}
+        autoCursor={false}
+        options={Object.assign({}, cmOptions, { theme })}
+      />
     );
   }
 }
@@ -231,9 +230,8 @@ class Selector extends Component {
     return shouldRender(this, nextProps, nextState);
   }
 
-  onLabelClick = label => {
+  onLabelChange = label => {
     return event => {
-      event.preventDefault();
       this.setState({ current: label });
       setImmediate(() => this.props.onSelected(samples[label]));
     };
@@ -241,20 +239,18 @@ class Selector extends Component {
 
   render() {
     return (
-      <ul className="nav nav-pills">
+      <div>
         {Object.keys(samples).map((label, i) => {
           return (
-            <li
+            <Tag.CheckableTag
               key={i}
-              role="presentation"
-              className={this.state.current === label ? "active" : ""}>
-              <a href="#" onClick={this.onLabelClick(label)}>
-                {label}
-              </a>
-            </li>
+              checked={this.state.current === label}
+              onChange={this.onLabelChange(label)}>
+              {label}
+            </Tag.CheckableTag>
           );
         })}
-      </ul>
+      </div>
     );
   }
 }
@@ -283,11 +279,7 @@ class CopyLink extends Component {
   render() {
     const { shareURL, onShare } = this.props;
     if (!shareURL) {
-      return (
-        <button className="btn btn-default" type="button" onClick={onShare}>
-          Share
-        </button>
-      );
+      return <Button onClick={onShare}>Share</Button>;
     }
     return (
       <div className="input-group">
@@ -298,12 +290,9 @@ class CopyLink extends Component {
           defaultValue={shareURL}
         />
         <span className="input-group-btn">
-          <button
-            className="btn btn-default"
-            type="button"
-            onClick={this.onCopyClick}>
-            <i className="glyphicon glyphicon-copy" />
-          </button>
+          <Button onClick={this.onCopyClick}>
+            <Icon type="copy" />
+          </Button>
         </span>
       </div>
     );
@@ -406,92 +395,111 @@ class App extends Component {
     } = this.state;
 
     return (
-      <div className="container-fluid">
-        <div className="page-header">
-          <h1>react-jsonschema-form</h1>
-          <div className="row">
-            <div className="col-sm-8">
-              <Selector onSelected={this.load} />
-            </div>
-            <div className="col-sm-2">
-              <Form
-                schema={liveValidateSchema}
-                formData={liveValidate}
-                onChange={this.setLiveValidate}>
-                <div />
-              </Form>
-            </div>
-            <div className="col-sm-2">
-              <ThemeSelector theme={theme} select={this.onThemeSelected} />
-            </div>
-          </div>
-        </div>
-        <div className="col-sm-7">
-          <Editor
-            title="JSONSchema"
-            theme={editor}
-            code={toJson(schema)}
-            onChange={this.onSchemaEdited}
-          />
-          <div className="row">
-            <div className="col-sm-6">
-              <Editor
-                title="UISchema"
-                theme={editor}
-                code={toJson(uiSchema)}
-                onChange={this.onUISchemaEdited}
-              />
-            </div>
-            <div className="col-sm-6">
-              <Editor
-                title="formData"
-                theme={editor}
-                code={toJson(formData)}
-                onChange={this.onFormDataEdited}
-              />
-            </div>
-          </div>
-        </div>
-        <div className="col-sm-5">
-          {this.state.form && (
-            <Form
-              ArrayFieldTemplate={ArrayFieldTemplate}
-              ObjectFieldTemplate={ObjectFieldTemplate}
-              liveValidate={liveValidate}
-              schema={schema}
-              uiSchema={uiSchema}
-              formData={formData}
-              onChange={this.onFormDataChange}
-              onSubmit={({ formData }) =>
-                console.log("submitted formData", formData)
-              }
-              fields={{ geo: GeoPosition }}
-              validate={validate}
-              onBlur={(id, value) =>
-                console.log(`Touched ${id} with value ${value}`)
-              }
-              onFocus={(id, value) =>
-                console.log(`Focused ${id} with value ${value}`)
-              }
-              transformErrors={transformErrors}
-              onError={log("errors")}>
-              <div className="row">
-                <div className="col-sm-3">
-                  <button className="btn btn-primary" type="submit">
-                    Submit
-                  </button>
-                </div>
-                <div className="col-sm-9 text-right">
-                  <CopyLink
-                    shareURL={this.state.shareURL}
-                    onShare={this.onShare}
-                  />
-                </div>
-              </div>
-            </Form>
-          )}
-        </div>
-      </div>
+      <Layout>
+        <Content>
+          <Row>
+            <Col span={24}>
+              <Row>
+                <Col span={24}>
+                  <h1>react-jsonschema-form</h1>
+                </Col>
+              </Row>
+              <Row
+                style={{
+                  borderBottom: "1px solid blue",
+                  marginBottom: "10px",
+                  paddingBottom: "10px",
+                }}>
+                <Col span={16}>
+                  <Selector onSelected={this.load} />
+                </Col>
+                <Col span={4}>
+                  <Form
+                    schema={liveValidateSchema}
+                    formData={liveValidate}
+                    onChange={this.setLiveValidate}>
+                    <div />
+                  </Form>
+                </Col>
+                <Col span={4}>
+                  <ThemeSelector theme={theme} select={this.onThemeSelected} />
+                </Col>
+              </Row>
+            </Col>
+          </Row>
+          <Row gutter={10} style={{ marginLeft: "10px", marginRight: "10px" }}>
+            <Col span={14}>
+              <Row>
+                <Col span={24} style={{ marginBottom: "10px" }}>
+                  <Card title="JSONSchema" bodyStyle={{ padding: "1px 0 0 0" }}>
+                    <Editor
+                      title=""
+                      theme={editor}
+                      code={toJson(schema)}
+                      onChange={this.onSchemaEdited}
+                    />
+                  </Card>
+                </Col>
+              </Row>
+              <Row gutter={10}>
+                <Col span={12}>
+                  <Card title="formData" bodyStyle={{ padding: "1px 0 0 0" }}>
+                    <Editor
+                      theme={editor}
+                      code={toJson(uiSchema)}
+                      onChange={this.onUISchemaEdited}
+                    />
+                  </Card>
+                </Col>
+                <Col span={12}>
+                  <Card title="formData" bodyStyle={{ padding: "1px 0 0 0" }}>
+                    <Editor
+                      theme={editor}
+                      code={toJson(formData)}
+                      onChange={this.onFormDataEdited}
+                    />
+                  </Card>
+                </Col>
+              </Row>
+            </Col>
+            <Col span={10}>
+              {this.state.form && (
+                <Form
+                  ArrayFieldTemplate={ArrayFieldTemplate}
+                  ObjectFieldTemplate={ObjectFieldTemplate}
+                  liveValidate={liveValidate}
+                  schema={schema}
+                  uiSchema={uiSchema}
+                  formData={formData}
+                  onChange={this.onFormDataChange}
+                  onSubmit={({ formData }) =>
+                    console.log("submitted formData", formData)
+                  }
+                  fields={{ geo: GeoPosition }}
+                  validate={validate}
+                  onBlur={(id, value) =>
+                    console.log(`Touched ${id} with value ${value}`)
+                  }
+                  onFocus={(id, value) =>
+                    console.log(`Focused ${id} with value ${value}`)
+                  }
+                  transformErrors={transformErrors}
+                  onError={log("errors")}>
+                  <div>
+                    <Button type="primary" htmlType="submit">
+                      Submit
+                    </Button>
+                    <CopyLink
+                      shareURL={this.state.shareURL}
+                      onShare={this.onShare}
+                    />
+                  </div>
+                </Form>
+              )}
+            </Col>
+          </Row>
+        </Content>
+      </Layout>
     );
   }
 }
