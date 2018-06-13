@@ -1,46 +1,47 @@
-import React from "react";
-import PropTypes from "prop-types";
-import { Checkbox, Row, Col } from "antd";
 import "antd/lib/checkbox/style/css";
 import "antd/lib/row/style/css";
 import "antd/lib/col/style/css";
+
+import { Checkbox, Col, Row } from "antd";
+
+import PropTypes from "prop-types";
+import React from "react";
+
 const CheckboxGroup = Checkbox.Group;
 
 function CheckboxesWidget(props) {
   const { id, disabled, options, value, autofocus, readonly, onChange } = props;
   const { enumOptions, inline } = options;
   return (
-    <div>
-      <CheckboxGroup
-        style={{ width: "100%" }}
-        value={value}
-        onChange={values => {
-          onChange(values);
-        }}>
-        <Row>
-          {enumOptions.map((option, index) => {
-            const disabledValue = disabled || readonly ? "disabled" : "";
-            const checkbox = (
-              <Checkbox
-                key={option.value}
-                value={option.value}
-                id={`${id}_${index}`}
-                disabled={disabledValue || readonly}
-                autoFocus={autofocus && index === 0}>
-                {option.label}
-              </Checkbox>
-            );
-            return inline ? (
-              <label key={index}>{checkbox}</label>
-            ) : (
-              <Col span={8} key={index}>
-                {checkbox}
-              </Col>
-            );
-          })}
-        </Row>
-      </CheckboxGroup>
-    </div>
+    <CheckboxGroup
+      style={{ width: "100%" }}
+      value={value}
+      onChange={values => {
+        onChange(values);
+      }}>
+      <Row>
+        {enumOptions.map((option, index) => {
+          const disabledValue = disabled || readonly ? "disabled" : "";
+          const checkbox = (
+            <Checkbox
+              key={option.value}
+              value={option.value}
+              id={`${id}_${index}`}
+              disabled={disabledValue || readonly}
+              autoFocus={autofocus && index === 0}>
+              {option.label}
+            </Checkbox>
+          );
+          return inline ? (
+            <label key={index}>{checkbox}</label>
+          ) : (
+            <Col span={8} key={index}>
+              {checkbox}
+            </Col>
+          );
+        })}
+      </Row>
+    </CheckboxGroup>
   );
 }
 

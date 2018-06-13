@@ -1,17 +1,21 @@
-import React from "react";
-import PropTypes from "prop-types";
+import "antd/lib/row/style/css";
+import "antd/lib/col/style/css";
 
+import { Col, Row } from "antd";
 import {
-  isMultiSelect,
-  retrieveSchema,
-  toIdSchema,
+  deepEquals,
   getDefaultRegistry,
-  mergeObjects,
+  getSchemaType,
   getUiOptions,
   isFilesArray,
-  deepEquals,
-  getSchemaType,
+  isMultiSelect,
+  mergeObjects,
+  retrieveSchema,
+  toIdSchema,
 } from "../../utils";
+
+import PropTypes from "prop-types";
+import React from "react";
 import UnsupportedField from "./UnsupportedField";
 
 const REQUIRED_FIELD_SYMBOL = "*";
@@ -55,8 +59,12 @@ function Label(props) {
   }
   return (
     <label className="control-label" htmlFor={id}>
+      {required && (
+        <span style={{ color: "red", marginRight: "4px" }}>
+          {REQUIRED_FIELD_SYMBOL}
+        </span>
+      )}
       {label}
-      {required && <span className="required">{REQUIRED_FIELD_SYMBOL}</span>}
     </label>
   );
 }
@@ -81,10 +89,10 @@ function ErrorList(props) {
   return (
     <div>
       <p />
-      <ul className="error-detail bs-callout bs-callout-info">
+      <ul style={{ padding: 0 }}>
         {errors.map((error, index) => {
           return (
-            <li className="text-danger" key={index}>
+            <li style={{ color: "red", listStyleType: "none" }} key={index}>
               {error}
             </li>
           );
@@ -110,7 +118,35 @@ function DefaultTemplate(props) {
   if (hidden) {
     return children;
   }
-
+  if (id !== "root") {
+    if (displayLabel) {
+      return (
+        <Row style={{ marginBottom: "10px" }} gutter={10}>
+          <Col span={6} style={{ textAlign: "right" }}>
+            {displayLabel && (
+              <Label label={label} required={required} id={id} />
+            )}:
+          </Col>
+          <Col span={18}>
+            {children}
+            {displayLabel && description ? description : null}
+            {errors}
+            {help}
+          </Col>
+        </Row>
+      );
+    }
+    return (
+      <Row style={{ marginBottom: "10px" }}>
+        <Col span={24}>
+          {displayLabel && description ? description : null}
+          {children}
+          {errors}
+          {help}
+        </Col>
+      </Row>
+    );
+  }
   return (
     <div className={classNames}>
       {displayLabel && <Label label={label} required={required} id={id} />}
@@ -230,7 +266,6 @@ function SchemaFieldRender(props) {
   const help = uiSchema["ui:help"];
   const hidden = uiSchema["ui:widget"] === "hidden";
   const classNames = [
-    "form-group",
     "field",
     `field-${type}`,
     errors && errors.length > 0 ? "field-error has-error has-danger" : "",

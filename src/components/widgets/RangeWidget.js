@@ -1,21 +1,20 @@
-import React from "react";
-import PropTypes from "prop-types";
+import "antd/lib/slider/style/css";
 
-import { rangeSpec } from "../../utils";
+import PropTypes from "prop-types";
+import React from "react";
+import { Slider } from "antd";
 
 function RangeWidget(props) {
-  const {
-    schema,
-    value,
-    registry: {
-      widgets: { BaseInput },
-    },
-  } = props;
+  const { schema, value, onChange, disabled } = props;
   return (
-    <div className="field-range-wrapper">
-      <BaseInput type="range" {...props} {...rangeSpec(schema)} />
-      <span className="range-view">{value}</span>
-    </div>
+    <Slider
+      min={schema.minimum}
+      max={schema.maximum}
+      value={value}
+      onChange={onChange}
+      disabled={disabled}
+      step={schema.multipleOf || 1}
+    />
   );
 }
 

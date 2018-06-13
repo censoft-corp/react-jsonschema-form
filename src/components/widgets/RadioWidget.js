@@ -1,5 +1,13 @@
-import React from "react";
+import "antd/lib/radio/style/css";
+import "antd/lib/row/style/css";
+import "antd/lib/col/style/css";
+
+import { Col, Radio, Row } from "antd";
+
 import PropTypes from "prop-types";
+import React from "react";
+
+const RadioGroup = Radio.Group;
 
 function RadioWidget(props) {
   const {
@@ -17,37 +25,39 @@ function RadioWidget(props) {
   // checked={checked} has been moved above name={name}, As mentioned in #349;
   // this is a temporary fix for radio button rendering bug in React, facebook/react#7630.
   return (
-    <div className="field-radio-group">
-      {enumOptions.map((option, i) => {
-        const checked = option.value === value;
-        const disabledCls = disabled || readonly ? "disabled" : "";
-        const radio = (
-          <span>
-            <input
-              type="radio"
+    <RadioGroup
+      style={{ width: "100%" }}
+      options={options}
+      value={value}
+      name={name}
+      onChange={e => {
+        onChange(e.target.value);
+      }}>
+      <Row>
+        {enumOptions.map((option, i) => {
+          const checked = option.value === value;
+          const radio = (
+            <Radio
               checked={checked}
-              name={name}
               required={required}
               value={option.value}
               disabled={disabled || readonly}
               autoFocus={autofocus && i === 0}
-              onChange={_ => onChange(option.value)}
-            />
-            <span>{option.label}</span>
-          </span>
-        );
+              onChange={_ => onChange(option.value)}>
+              {option.label}
+            </Radio>
+          );
 
-        return inline ? (
-          <label key={i} className={`radio-inline ${disabledCls}`}>
-            {radio}
-          </label>
-        ) : (
-          <div key={i} className={`radio ${disabledCls}`}>
-            <label>{radio}</label>
-          </div>
-        );
-      })}
-    </div>
+          return inline ? (
+            <label key={i}>{radio}</label>
+          ) : (
+            <Col span={8} key={i}>
+              <label>{radio}</label>
+            </Col>
+          );
+        })}
+      </Row>
+    </RadioGroup>
   );
 }
 

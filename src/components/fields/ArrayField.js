@@ -1,20 +1,25 @@
-import React, { Component } from "react";
-import PropTypes from "prop-types";
+import "antd/lib/button/style/css";
+import "antd/lib/icon/style/css";
+import "antd/lib/table/style/css";
 
-import UnsupportedField from "./UnsupportedField";
+import { Button, Icon, Table } from "antd";
+import React, { Component } from "react";
 import {
-  getWidget,
+  allowAdditionalItems,
   getDefaultFormState,
+  getDefaultRegistry,
   getUiOptions,
-  isMultiSelect,
+  getWidget,
   isFilesArray,
   isFixedItems,
-  allowAdditionalItems,
+  isMultiSelect,
   optionsList,
   retrieveSchema,
   toIdSchema,
-  getDefaultRegistry,
 } from "../../utils";
+
+import PropTypes from "prop-types";
+import UnsupportedField from "./UnsupportedField";
 
 function ArrayFieldTitle({ TitleField, idSchema, title, required }) {
   if (!title) {
@@ -37,80 +42,71 @@ function ArrayFieldDescription({ DescriptionField, idSchema, description }) {
 function IconBtn(props) {
   const { type = "default", icon, className, ...otherProps } = props;
   return (
-    <button
-      type="button"
-      className={`btn btn-${type} ${className}`}
-      {...otherProps}>
-      <i className={`glyphicon glyphicon-${icon}`} />
-    </button>
+    <Button type={type} {...otherProps}>
+      <Icon type={icon} />
+    </Button>
   );
 }
 
 // Used in the two templates
 function DefaultArrayItem(props) {
   const btnStyle = {
-    flex: 1,
-    paddingLeft: 6,
-    paddingRight: 6,
+    marginRight: "6px",
     fontWeight: "bold",
   };
   return (
-    <div key={props.index} className={props.className}>
-      <div className={props.hasToolbar ? "col-xs-9" : "col-xs-12"}>
-        {props.children}
-      </div>
+    props.hasToolbar && (
+      <Button.Group key={props.index}>
+        {(props.hasMoveUp || props.hasMoveDown) && (
+          <IconBtn
+            size="small"
+            icon="arrow-up"
+            tabIndex="-1"
+            style={btnStyle}
+            disabled={props.disabled || props.readonly || !props.hasMoveUp}
+            onClick={props.onReorderClick(props.index, props.index - 1)}
+          />
+        )}
 
-      {props.hasToolbar && (
-        <div className="col-xs-3 array-item-toolbox">
-          <div
-            className="btn-group"
-            style={{
-              display: "flex",
-              justifyContent: "space-around",
-            }}>
-            {(props.hasMoveUp || props.hasMoveDown) && (
-              <IconBtn
-                icon="arrow-up"
-                className="array-item-move-up"
-                tabIndex="-1"
-                style={btnStyle}
-                disabled={props.disabled || props.readonly || !props.hasMoveUp}
-                onClick={props.onReorderClick(props.index, props.index - 1)}
-              />
-            )}
+        {(props.hasMoveUp || props.hasMoveDown) && (
+          <IconBtn
+            size="small"
+            icon="arrow-down"
+            tabIndex="-1"
+            style={btnStyle}
+            disabled={props.disabled || props.readonly || !props.hasMoveDown}
+            onClick={props.onReorderClick(props.index, props.index + 1)}
+          />
+        )}
 
-            {(props.hasMoveUp || props.hasMoveDown) && (
-              <IconBtn
-                icon="arrow-down"
-                className="array-item-move-down"
-                tabIndex="-1"
-                style={btnStyle}
-                disabled={
-                  props.disabled || props.readonly || !props.hasMoveDown
-                }
-                onClick={props.onReorderClick(props.index, props.index + 1)}
-              />
-            )}
-
-            {props.hasRemove && (
-              <IconBtn
-                type="danger"
-                icon="remove"
-                className="array-item-remove"
-                tabIndex="-1"
-                style={btnStyle}
-                disabled={props.disabled || props.readonly}
-                onClick={props.onDropIndexClick(props.index)}
-              />
-            )}
-          </div>
-        </div>
-      )}
-    </div>
+        {props.hasRemove && (
+          <IconBtn
+            size="small"
+            type="danger"
+            icon="close"
+            tabIndex="-1"
+            style={btnStyle}
+            disabled={props.disabled || props.readonly}
+            onClick={props.onDropIndexClick(props.index)}
+          />
+        )}
+      </Button.Group>
+    )
   );
 }
 
 function DefaultFixedArrayFieldTemplate(props) {
+  const columns = [
+    {
+      dataIndex: "children",
+      key: "content",
+    },
+    {
+      key: "action",
+      render: (text, record) => DefaultArrayItem(record),
+      width: 140,
+    },
+  ];
   return (
     <fieldset className={props.className}>
       <ArrayFieldTitle
@@ -129,12 +125,16 @@ function DefaultFixedArrayFieldTemplate(props) {
         </div>
       )}
 
-      <div
-        className="row array-item-list"
-        key={`array-item-list-${props.idSchema.$id}`}>
-        {props.items && props.items.map(DefaultArrayItem)}
-      </div>
-
+      <Table
+        dataSource={props.items}
+        rowKey="index"
+        pagination={false}
+        showHeader={false}
+        columns={columns}
+        expandIconAsCell={false}
+        expandIconColumnIndex={-1}
+        bordered={true}
+      />
       {props.canAdd && (
         <AddButton
           onClick={props.onAddClick}
@@ -146,6 +146,17 @@ function DefaultFixedArrayFieldTemplate(props) {
 }
 
 function DefaultNormalArrayFieldTemplate(props) {
+  const columns = [
+    {
+      dataIndex: "children",
+      key: "content",
+    },
+    {
+      key: "action",
+      render: (text, record) => DefaultArrayItem(record),
+      width: 140,
+    },
+  ];
   return (
     <fieldset className={props.className}>
       <ArrayFieldTitle
@@ -166,16 +177,21 @@ function DefaultNormalArrayFieldTemplate(props) {
           }
         />
       )}
-
-      <div
-        className="row array-item-list"
-        key={`array-item-list-${props.idSchema.$id}`}>
-        {props.items && props.items.map(p => DefaultArrayItem(p))}
-      </div>
+      <Table
+        dataSource={props.items}
+        rowKey="index"
+        pagination={false}
+        showHeader={false}
+        columns={columns}
+        expandIconAsCell={false}
+        expandIconColumnIndex={-1}
+        bordered={true}
+      />
 
       {props.canAdd && (
         <AddButton
           onClick={props.onAddClick}
+          style={{ marginLeft: "40px" }}
           disabled={props.disabled || props.readonly}
         />
       )}
@@ -672,6 +688,7 @@ function AddButton({ onClick, disabled }) {
     <div className="row">
       <p className="col-xs-3 col-xs-offset-9 array-item-add text-right">
         <IconBtn
+          style={{ marginLeft: "40px" }}
           type="info"
           icon="plus"
           className="btn-add col-xs-12"

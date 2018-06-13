@@ -1,5 +1,8 @@
-import React from "react";
+import "antd/lib/input/style/css";
+
+import { Input } from "antd";
 import PropTypes from "prop-types";
+import React from "react";
 
 function BaseInput(props) {
   // Note: since React 15.2.0 we can't forward unknown element attributes, so we
@@ -19,6 +22,7 @@ function BaseInput(props) {
     schema,
     formContext,
     registry,
+    errors,
     ...inputProps
   } = props;
 
@@ -28,13 +32,14 @@ function BaseInput(props) {
   };
 
   const { rawErrors, ...cleanProps } = inputProps;
-
+  console.log("errors", errors);
+  const style = errors && errors.length ? { border: "1px solid red" } : {};
   return (
-    <input
-      className="form-control"
-      readOnly={readonly}
+    <Input
       disabled={disabled}
+      readOnly={readonly}
       autoFocus={autofocus}
+      style={style}
       value={value == null ? "" : value}
       {...cleanProps}
       onChange={_onChange}

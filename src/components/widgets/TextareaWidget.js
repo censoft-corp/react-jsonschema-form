@@ -1,6 +1,10 @@
-import React from "react";
-import PropTypes from "prop-types";
+import "antd/lib/input/style/css";
 
+import { Input } from "antd";
+import PropTypes from "prop-types";
+import React from "react";
+
+const InputTextArea = Input.TextArea;
 function TextareaWidget(props) {
   const {
     id,
@@ -19,9 +23,8 @@ function TextareaWidget(props) {
     return onChange(value === "" ? options.emptyValue : value);
   };
   return (
-    <textarea
+    <InputTextArea
       id={id}
-      className="form-control"
       value={typeof value === "undefined" ? "" : value}
       placeholder={placeholder}
       required={required}

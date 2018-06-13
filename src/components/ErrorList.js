@@ -1,21 +1,25 @@
+import "antd/lib/alert/style/css";
+import "antd/lib/list/style/css";
+
+import { Alert, List } from "antd";
+
 import React from "react";
 
 export default function ErrorList(props) {
   const { errors } = props;
   return (
-    <div className="panel panel-danger errors">
-      <div className="panel-heading">
-        <h3 className="panel-title">Errors</h3>
-      </div>
-      <ul className="list-group">
-        {errors.map((error, i) => {
-          return (
-            <li key={i} className="list-group-item text-danger">
-              {error.stack}
-            </li>
-          );
-        })}
-      </ul>
-    </div>
+    <Alert
+      message="错误信息"
+      description={
+        <List
+          dataSource={errors.map(x => x.stack)}
+          renderItem={item => <List.Item>{item}</List.Item>}
+          size="small"
+        />
+      }
+      type="error"
+      closable
+      showIcon
+    />
   );
 }

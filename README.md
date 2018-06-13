@@ -1,9 +1,10 @@
-react-jsonschema-form
+react-jsonschema-form-antd
 =====================
-
+not complete.
+DO NOT USE IT NOW!
 [![Build Status](https://travis-ci.org/mozilla-services/react-jsonschema-form.svg)](https://travis-ci.org/mozilla-services/react-jsonschema-form)
 
-A simple [React](http://facebook.github.io/react/) component capable of building HTML forms out of a [JSON schema](http://json-schema.org/) and using [Bootstrap](http://getbootstrap.com/) semantics by default.
+A simple [React](http://facebook.github.io/react/) component capable of building HTML forms out of a [JSON schema](http://json-schema.org/) and using [AntD](https://github.com/ant-design/ant-design).
 
 A [live playground](https://mozilla-services.github.io/react-jsonschema-form/) is hosted on gh-pages.
 

@@ -1,13 +1,4 @@
-import React, { Component } from "react";
-import { render } from "react-dom";
-import { UnControlled as CodeMirror } from "react-codemirror2";
 import "codemirror/mode/javascript/javascript";
-import { Layout, Row, Col, Tag, Button, Icon, Card } from "antd";
-import { shouldRender } from "../src/utils";
-import { samples } from "./samples";
-import Form from "../src";
-// Import a few CodeMirror themes; these are used to match alternative
-// bootstrap ones.
 import "codemirror/lib/codemirror.css";
 import "codemirror/theme/dracula.css";
 import "codemirror/theme/blackboard.css";
@@ -16,7 +7,6 @@ import "codemirror/theme/ttcn.css";
 import "codemirror/theme/solarized.css";
 import "codemirror/theme/monokai.css";
 import "codemirror/theme/eclipse.css";
-const { Content } = Layout;
 import "antd/lib/layout/style/css";
 import "antd/lib/row/style/css";
 import "antd/lib/col/style/css";
@@ -24,6 +14,20 @@ import "antd/lib/tag/style/css";
 import "antd/lib/button/style/css";
 import "antd/lib/card/style/css";
 import "antd/lib/icon/style/css";
+
+import { Button, Card, Col, Icon, Layout, Row, Tag } from "antd";
+import React, { Component } from "react";
+
+import { UnControlled as CodeMirror } from "react-codemirror2";
+import Form from "../src";
+import { render } from "react-dom";
+import { samples } from "./samples";
+import { shouldRender } from "../src/utils";
+
+// Import a few CodeMirror themes; these are used to match alternative
+// bootstrap ones.
+
+const { Content } = Layout;
 
 const log = type => console.log.bind(console, type);
 const fromJson = json => JSON.parse(json);
@@ -208,14 +212,19 @@ class Editor extends Component {
   };
 
   render() {
-    const { theme } = this.props;
+    const { theme, title } = this.props;
     return (
-      <CodeMirror
-        value={this.state.code}
-        onChange={this.onCodeChange}
-        autoCursor={false}
-        options={Object.assign({}, cmOptions, { theme })}
-      />
+      <Card
+        title={title}
+        style={{ border: "1px solid grey", boxShadow: "4px 4px 3px #888888" }}
+        bodyStyle={{ padding: "1px 0 0 0" }}>
+        <CodeMirror
+          value={this.state.code}
+          onChange={this.onCodeChange}
+          autoCursor={false}
+          options={Object.assign({}, cmOptions, { theme })}
+        />
+      </Card>
     );
   }
 }
@@ -397,7 +406,7 @@ class App extends Component {
     return (
       <Layout>
         <Content>
-          <Row>
+          <Row style={{ margin: "10px" }}>
             <Col span={24}>
               <Row>
                 <Col span={24}>
@@ -406,8 +415,7 @@ class App extends Component {
               </Row>
               <Row
                 style={{
-                  borderBottom: "1px solid blue",
-                  marginBottom: "10px",
+                  borderBottom: "1px solid red",
                   paddingBottom: "10px",
                 }}>
                 <Col span={16}>
@@ -427,74 +435,76 @@ class App extends Component {
               </Row>
             </Col>
           </Row>
-          <Row gutter={10} style={{ marginLeft: "10px", marginRight: "10px" }}>
+          <Row gutter={10} style={{ margin: "10px" }}>
             <Col span={14}>
               <Row>
                 <Col span={24} style={{ marginBottom: "10px" }}>
-                  <Card title="JSONSchema" bodyStyle={{ padding: "1px 0 0 0" }}>
-                    <Editor
-                      title=""
-                      theme={editor}
-                      code={toJson(schema)}
-                      onChange={this.onSchemaEdited}
-                    />
-                  </Card>
+                  <Editor
+                    title="JSONSchema"
+                    theme={editor}
+                    code={toJson(schema)}
+                    onChange={this.onSchemaEdited}
+                  />
                 </Col>
               </Row>
               <Row gutter={10}>
                 <Col span={12}>
-                  <Card title="formData" bodyStyle={{ padding: "1px 0 0 0" }}>
-                    <Editor
-                      theme={editor}
-                      code={toJson(uiSchema)}
-                      onChange={this.onUISchemaEdited}
-                    />
-                  </Card>
+                  <Editor
+                    title="JSONUiSchema"
+                    theme={editor}
+                    code={toJson(uiSchema)}
+                    onChange={this.onUISchemaEdited}
+                  />
                 </Col>
                 <Col span={12}>
-                  <Card title="formData" bodyStyle={{ padding: "1px 0 0 0" }}>
-                    <Editor
-                      theme={editor}
-                      code={toJson(formData)}
-                      onChange={this.onFormDataEdited}
-                    />
-                  </Card>
+                  <Editor
+                    title="formData"
+                    theme={editor}
+                    code={toJson(formData)}
+                    onChange={this.onFormDataEdited}
+                  />
                 </Col>
               </Row>
             </Col>
             <Col span={10}>
               {this.state.form && (
-                <Form
-                  ArrayFieldTemplate={ArrayFieldTemplate}
-                  ObjectFieldTemplate={ObjectFieldTemplate}
-                  liveValidate={liveValidate}
-                  schema={schema}
-                  uiSchema={uiSchema}
-                  formData={formData}
-                  onChange={this.onFormDataChange}
-                  onSubmit={({ formData }) =>
-                    console.log("submitted formData", formData)
-                  }
-                  fields={{ geo: GeoPosition }}
-                  validate={validate}
-                  onBlur={(id, value) =>
-                    console.log(`Touched ${id} with value ${value}`)
-                  }
-                  onFocus={(id, value) =>
-                    console.log(`Focused ${id} with value ${value}`)
-                  }
-                  transformErrors={transformErrors}
-                  onError={log("errors")}>
-                  <div>
-                    <Button type="primary" htmlType="submit">
-                      Submit
-                    </Button>
-                    <CopyLink
-                      shareURL={this.state.shareURL}
-                      onShare={this.onShare}
-                    />
-                  </div>
-                </Form>
+                <Card
+                  style={{
+                    boxShadow: "6px 6px 3px #888888",
+                    border: "1px solid grey",
+                  }}>
+                  <Form
+                    ArrayFieldTemplate={ArrayFieldTemplate}
+                    ObjectFieldTemplate={ObjectFieldTemplate}
+                    liveValidate={liveValidate}
+                    schema={schema}
+                    uiSchema={uiSchema}
+                    formData={formData}
+                    onChange={this.onFormDataChange}
+                    onSubmit={({ formData }) =>
+                      console.log("submitted formData", formData)
+                    }
+                    fields={{ geo: GeoPosition }}
+                    validate={validate}
+                    onBlur={(id, value) =>
+                      console.log(`Touched ${id} with value ${value}`)
+                    }
+                    onFocus={(id, value) =>
+                      console.log(`Focused ${id} with value ${value}`)
+                    }
+                    transformErrors={transformErrors}
+                    onError={log("errors")}>
+                    <div>
+                      <Button type="primary" htmlType="submit">
+                        Submit
+                      </Button>
+                      <CopyLink
+                        shareURL={this.state.shareURL}
+                        onShare={this.onShare}
+                      />
+                    </div>
+                  </Form>
+                </Card>
               )}
             </Col>
           </Row>
